@@ -1,8 +1,9 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.OpModes;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+import org.firstinspires.ftc.teamcode.Map.DistanceData;
 import org.firstinspires.ftc.teamcode.Roadrunner.drive.SampleTankDrive;
 import org.firstinspires.ftc.teamcode.Subsystems.DistSensor;
 import org.firstinspires.ftc.teamcode.Subsystems.ServoAngle;

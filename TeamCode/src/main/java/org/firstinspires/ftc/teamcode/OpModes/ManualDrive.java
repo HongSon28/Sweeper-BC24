@@ -62,16 +62,14 @@ public class ManualDrive extends LinearOpMode {
                 //servo.setAngle(currentAngle);
                 boolean curr_state = gamepad1.right_bumper;
                 double curr_time = timer.now(TimeUnit.MILLISECONDS);
-                if (updateRequired && curr_time - last_time >= 500) { updateData(); last_time = curr_time; };
+                if (updateRequired && curr_time - last_time >= 500) {
+                    updateData();
+                    last_time = curr_time;
+                }
 
                 prev_state = curr_state;
-
                 if (gamepad1.triangle) updateRequired = false;
                 else if (gamepad1.square) updateRequired = true;
-
-                if (gamepad1.cross) manualDrive = false;
-            } else {
-                if (gamepad1.circle) manualDrive = true;
             }
 
             Pose2d currentPose = tankDrive.getPoseEstimate();

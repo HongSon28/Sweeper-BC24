@@ -9,7 +9,7 @@ import static org.firstinspires.ftc.teamcode.Constants.DISTANCE_SENSOR.*;
 
 public class DistSensor {
     private DistanceSensor sensorDistance;
-    public KalmanFilter filter = new KalmanFilter(KALMAN_Q, KALMAN_R, KALMAN_N);
+    private KalmanFilter filter = new KalmanFilter(KALMAN_Q, KALMAN_R, KALMAN_N);
 
     public DistSensor(HardwareMap hardwareMap) {
         sensorDistance = hardwareMap.get(DistanceSensor.class, "sensor_distance");
@@ -21,7 +21,7 @@ public class DistSensor {
 
     public double getDist() {
         double dist = getRawDist();
-        if (dist > DISTANCE_THRESHOLD) {
+        if (dist > DISTANCE_THRESHOLD || dist < 0) {
             return -1; // Invalid
         }
 

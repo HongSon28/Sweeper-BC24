@@ -5,6 +5,7 @@ import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Map.DistanceData;
 import org.firstinspires.ftc.teamcode.Roadrunner.drive.SampleTankDrive;
@@ -14,6 +15,7 @@ import static org.firstinspires.ftc.teamcode.Constants.GRID.*;
 import static org.firstinspires.ftc.teamcode.Constants.DISTANCE_SENSOR.*;
 
 import java.util.Vector;
+import java.util.concurrent.TimeUnit;
 
 @TeleOp(name = "Auto Collect Drive")
 public class AutoCollectData extends LinearOpMode {
@@ -24,7 +26,6 @@ public class AutoCollectData extends LinearOpMode {
     private SampleTankDrive tankDrive;
     private DistSensor distSensor;
     private ServoAngle servo;
-    private boolean updateRequired = true;
     private double currentAngle = 0;
     public Vector <DistanceData> dataStorage;
     @Override
@@ -35,16 +36,18 @@ public class AutoCollectData extends LinearOpMode {
 
         dataStorage = new Vector<DistanceData>();
 
-        isVisited[0][0] = true;
 
         waitForStart();
 
         while (opModeIsActive()) {
+            if (!isVisited[cx][cy]) {
+                updateData();
+                isVisited[cx][cy] = true;
+            }
             runNextBox();
             tankDrive.updatePoseEstimate();
 
             servo.setAngle(currentAngle);
-            if (updateRequired) updateData();
 
             Pose2d currentPose = tankDrive.getPoseEstimate();
             telemetry.addData("Current X: ", currentPose.getX());
@@ -57,7 +60,9 @@ public class AutoCollectData extends LinearOpMode {
     }
 
     boolean isClear() {
-        return distSensor.getDist() >= CLEAR_THRESHOLD;
+        telemetry.addData("Clear Check: ",distSensor.getRawDist());
+        telemetry.update();
+        return distSensor.getRawDist() >= CLEAR_THRESHOLD;
     }
     boolean check(int x, int y) {
         return (x>=0 && y>=0 && x<50 && y<50 && !isVisited[x][y]);
@@ -129,6 +134,7 @@ public class AutoCollectData extends LinearOpMode {
                 goForward();
 
                 updateData();
+                return;
             }
         }
 
@@ -146,6 +152,9 @@ public class AutoCollectData extends LinearOpMode {
                 goForward();
 
                 updateData();
+
+                Turn(180);
+                return;
             }
             Turn(180);
         }
@@ -164,6 +173,9 @@ public class AutoCollectData extends LinearOpMode {
                 goForward();
 
                 updateData();
+
+                Turn(-90);
+                return;
             }
             Turn(-90);
         }
@@ -174,7 +186,7 @@ public class AutoCollectData extends LinearOpMode {
         if (check(tx,ty)) {
             Turn(-90);
             if (isClear()) {
-                lastPos[tx][ty] = new Vector2d(cx,cy);
+                lastPos[tx][ty] = new Vector2d(cx, cy);
                 cx = tx;
                 cy = ty;
                 isVisited[cx][cy] = true;
@@ -182,9 +194,13 @@ public class AutoCollectData extends LinearOpMode {
                 goForward();
 
                 updateData();
+
+                Turn(90);
+                return;
             }
             Turn(90);
         }
+        if (cx == 0 && cy == 0) return;
 
         runBack();
     }

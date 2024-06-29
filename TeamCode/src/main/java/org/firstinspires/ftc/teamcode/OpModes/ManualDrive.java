@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.OpModes;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.Map.DistanceData;
 import org.firstinspires.ftc.teamcode.Roadrunner.drive.SampleTankDrive;
@@ -10,12 +11,12 @@ import org.firstinspires.ftc.teamcode.Subsystems.ServoAngle;
 
 import java.util.Vector;
 
-public class Main extends LinearOpMode {
+@TeleOp(name = "Manual Drive")
+public class ManualDrive extends LinearOpMode {
 
     private SampleTankDrive tankDrive;
     private DistSensor distSensor;
     private ServoAngle servo;
-    private boolean manualDrive = true;
     private boolean updateRequired = true;
     private double currentAngle = 0;
     public Vector <DistanceData> dataStorage;
@@ -28,22 +29,16 @@ public class Main extends LinearOpMode {
         waitForStart();
 
         while (opModeIsActive()) {
-            if (manualDrive) {
-                tankDrive.setDrivePower(new Pose2d(-gamepad1.left_stick_y, 0, gamepad1.left_stick_x));
-                tankDrive.updatePoseEstimate();
-                if (gamepad1.right_bumper) currentAngle++;
-                else if (gamepad1.left_bumper) currentAngle--;
+            tankDrive.setDrivePower(new Pose2d(-gamepad1.left_stick_y, 0, gamepad1.left_stick_x));
+            tankDrive.updatePoseEstimate();
+            if (gamepad1.right_bumper) currentAngle++;
+            else if (gamepad1.left_bumper) currentAngle--;
 
-                servo.setAngle(currentAngle);
-                if (updateRequired) updateData();
+            servo.setAngle(currentAngle);
+            if (updateRequired) updateData();
 
-                if (gamepad1.triangle) updateRequired = false;
-                else if (gamepad1.square) updateRequired = true;
-
-                if (gamepad1.cross) manualDrive = false;
-            } else {
-                if (gamepad1.circle) manualDrive = true;
-            }
+            if (gamepad1.triangle) updateRequired = false;
+            else if (gamepad1.square) updateRequired = true;
 
             Pose2d currentPose = tankDrive.getPoseEstimate();
             telemetry.addData("Current X: ", currentPose.getX());

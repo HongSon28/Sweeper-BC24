@@ -24,7 +24,7 @@ public class TestCanvas extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         FtcDashboard dashboard = FtcDashboard.getInstance();
-        MapDrawer mapDrawer = new MapDrawer(dashboard, 8, 15);
+        MapDrawer mapDrawer = new MapDrawer(dashboard, 8, 15, 0.5);
 
         waitForStart();
         mapDrawer.init();

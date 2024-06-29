@@ -9,7 +9,7 @@ public class MapDrawer {
     public TelemetryPacket packet;
     public Canvas canvas;
 
-    double bot_w, bot_h;
+    double bot_w, bot_h, scale_factor;
 
     public MapDrawer(FtcDashboard _dashboard, double bot_width, double bot_height) {
         // Set dashboard object
@@ -24,6 +24,22 @@ public class MapDrawer {
         // Set bot width and height
         bot_w = bot_width;
         bot_h = bot_height;
+    }
+
+    public MapDrawer(FtcDashboard _dashboard, double bot_width, double bot_height, double _scale_factor) {
+        // Set dashboard object
+        this.dashboard = _dashboard;
+
+        // Create telemetry packet
+        packet = new TelemetryPacket(false);
+
+        // Set canvas object
+        canvas = packet.fieldOverlay();
+
+        // Set bot width and height
+        bot_w = bot_width;
+        bot_h = bot_height;
+        scale_factor = _scale_factor;
     }
 
     public void init() {
@@ -55,15 +71,15 @@ public class MapDrawer {
     }
 
     public void drawBot(double x, double y, double rad) {
-        double[] xPoints = {x, x + bot_w};
-        double[] yPoints = {y, y + bot_h};
+        double[] xPoints = {x * scale_factor, (x + bot_w) * scale_factor};
+        double[] yPoints = {y * scale_factor, (y + bot_h) * scale_factor};
         rotatePoints(xPoints, yPoints, rad);
         canvas.setFill("green").fillPolygon(xPoints, yPoints);
     }
 
     public void drawPoint(double distance, double rad) {
-        double x = distance * Math.sin(rad);
-        double y = distance * Math.cos(rad);
+        double x = distance * Math.sin(rad) * scale_factor;
+        double y = distance * Math.cos(rad) * scale_factor;
         canvas.setFill("red").fillCircle(x, y, 1);
     }
 

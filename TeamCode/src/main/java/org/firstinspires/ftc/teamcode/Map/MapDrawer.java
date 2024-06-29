@@ -13,6 +13,8 @@ public class MapDrawer {
     public TelemetryPacket packet;
     public Canvas canvas;
 
+    private Logger logger = new Logger(true);
+
     double bot_w, bot_h, scale_factor;
 
     public MapDrawer(FtcDashboard _dashboard, double bot_width, double bot_height) {
@@ -102,11 +104,13 @@ public class MapDrawer {
         double p_x = d * Math.cos(rad) * scale_factor;
         double p_y = d * Math.sin(rad) * scale_factor;
         canvas.setFill("red").fillCircle(x + p_x, y + p_y, 1);
+        logger.logO(x + p_x, y + p_y);
         //opMode.telemetry.addData("point", "%f, %f", x + p_x, y + p_y);
         //opMode.telemetry.update();
     }
 
     public void drawState(double x, double y, double rad, double dist) {
+        logger.logI(x, y, rad, dist);
         //double ang = angleWrap(rad + Math.PI/2);
         //drawBot(x, y, rad);
         drawPoint(x, y, dist, rad);

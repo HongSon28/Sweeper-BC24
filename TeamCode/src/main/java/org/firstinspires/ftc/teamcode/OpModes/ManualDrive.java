@@ -12,14 +12,13 @@ import org.firstinspires.ftc.teamcode.Map.DistanceData;
 import org.firstinspires.ftc.teamcode.Map.MapDrawer;
 import org.firstinspires.ftc.teamcode.Roadrunner.drive.SampleTankDrive;
 import org.firstinspires.ftc.teamcode.Subsystems.DistSensor;
-import org.firstinspires.ftc.teamcode.Subsystems.ServoAngle;
 
 import java.util.Vector;
 import java.util.concurrent.TimeUnit;
 
 @Config
 @TeleOp(name = "Manual scan")
-public class Main extends LinearOpMode {
+public class ManualDrive extends LinearOpMode {
 
     private SampleTankDrive tankDrive;
     private DistSensor distSensor;

@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.OpModes;
 
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
@@ -8,6 +9,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Map.DistanceData;
+import org.firstinspires.ftc.teamcode.Map.MapDrawer;
 import org.firstinspires.ftc.teamcode.Roadrunner.drive.SampleTankDrive;
 import org.firstinspires.ftc.teamcode.Subsystems.DistSensor;
 import org.firstinspires.ftc.teamcode.Subsystems.ServoAngle;
@@ -28,6 +30,8 @@ public class AutoCollectData extends LinearOpMode {
     private ServoAngle servo;
     private double currentAngle = 0;
     public Vector <DistanceData> dataStorage;
+    private MapDrawer mapDrawer;
+    private FtcDashboard dashboard;
     @Override
     public void runOpMode() {
         tankDrive = new SampleTankDrive(hardwareMap);
@@ -36,6 +40,8 @@ public class AutoCollectData extends LinearOpMode {
 
         dataStorage = new Vector<DistanceData>();
 
+        dashboard = FtcDashboard.getInstance();
+        mapDrawer = new MapDrawer(dashboard, 8, 15, 1);
 
         waitForStart();
 
@@ -210,6 +216,7 @@ public class AutoCollectData extends LinearOpMode {
             Pose2d currentPose = tankDrive.getPoseEstimate();
             DistanceData currentData = new DistanceData(currentPose, distSensor.getDist(), currentAngle);
             dataStorage.add(currentData);
+            mapDrawer.drawState(currentPose.getX(), currentPose.getY(), mapDrawer.angleWrap(currentPose.getHeading()), distSensor.getDist());
             Turn(45);
         }
     }

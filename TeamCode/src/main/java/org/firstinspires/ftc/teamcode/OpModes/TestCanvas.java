@@ -27,7 +27,7 @@ public class TestCanvas extends LinearOpMode {
         MapDrawer mapDrawer = new MapDrawer(dashboard, 8, 15, 0.5);
 
         waitForStart();
-        mapDrawer.init();
+        mapDrawer.init(this);
 
         //mapDrawer.drawBot(0, 0, Math.PI / 4);
         //mapDrawer.update();

@@ -5,7 +5,6 @@ import com.acmerobotics.roadrunner.geometry.Pose2d;
 
 @Config
 public class Constants {
-    @Config
     public static class DISTANCE_SENSOR {
         public static final Pose2d DS_LOCATION = new Pose2d(0, 1, 0);
 
@@ -13,5 +12,9 @@ public class Constants {
         public static double KALMAN_R = 3;
         public static int KALMAN_N = 3;
         public static int DISTANCE_THRESHOLD = 75;
+    }
+
+    public static class MAP {
+        public static double BOT_CENTER_TO_DISTANCE_SENSOR = 7.08;
     }
 }

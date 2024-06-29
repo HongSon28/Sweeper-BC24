@@ -25,6 +25,7 @@ public class DistSensor {
             return -1; // Invalid
         }
 
-        return filter.estimate(getRawDist());
+        //return filter.estimate(getRawDist());
+        return dist;
     }
 }

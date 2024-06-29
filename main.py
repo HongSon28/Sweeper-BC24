@@ -2,12 +2,12 @@ import cv2
 import pandas as pd
 import numpy as np
 
-df = pd.read_csv("point.csv")
+df = pd.read_csv("point.csv").values
 
-img = np.ones((1000,1000,3), np.uint8) * 255
+img = np.ones((max(df[:, 1]) + abs(min(df[:, 1])) + 20, max(df[:, 0]) + abs(min(df[:, 0])) + 20, 3), np.uint8) * 255
 
-for point in df.values:
-    cv2.circle(img, (point[0] + 500, point[1] + 500), 1, (0, 0, 255), 3)
+for point in df:
+    cv2.circle(img, (point[0] + abs(min(df[:, 0])) + 10, point[1] + abs(min(df[:, 1])) + 10), 1, (0, 0, 255), 3)
 
 cv2.imshow("frame", img)
 

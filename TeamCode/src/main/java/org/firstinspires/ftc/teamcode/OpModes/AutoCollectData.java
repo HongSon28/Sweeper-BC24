@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.OpModes;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -14,10 +15,11 @@ import static org.firstinspires.ftc.teamcode.Constants.DISTANCE_SENSOR.*;
 
 import java.util.Vector;
 
-@TeleOp(name = "Manual Drive")
+@TeleOp(name = "Auto Collect Drive")
 public class AutoCollectData extends LinearOpMode {
 
     boolean[][] isVisited = new boolean[50][50];
+    Vector2d[][] lastPos = new Vector2d[50][50];
     int cx = 0, cy = 0;
     private SampleTankDrive tankDrive;
     private DistSensor distSensor;
@@ -30,6 +32,8 @@ public class AutoCollectData extends LinearOpMode {
         tankDrive = new SampleTankDrive(hardwareMap);
         distSensor = new DistSensor(hardwareMap);
         servo = new ServoAngle(hardwareMap);
+
+        dataStorage = new Vector<DistanceData>();
 
         isVisited[0][0] = true;
 
@@ -65,22 +69,66 @@ public class AutoCollectData extends LinearOpMode {
         tankDrive.updatePoseEstimate();
     }
 
+    public void goBackward() {
+        Trajectory trajectory = tankDrive.trajectoryBuilder(new Pose2d()).back(GRID_SIZE).build();
+        tankDrive.followTrajectory(trajectory);
+        tankDrive.waitForIdle();
+        tankDrive.updatePoseEstimate();
+    }
+
+
     public void Turn(double angle) {
         tankDrive.turn(Math.toRadians(angle));
         tankDrive.waitForIdle();
         tankDrive.updatePoseEstimate();
     }
+
+    public void runBack() {
+        int x = (int) lastPos[cx][cy].getX();
+        int y = (int) lastPos[cx][cy].getY();
+        //Go back
+        if (x == cx - 1 && y == cy) {
+            goBackward();
+            cx--;
+        }
+
+        //Go front
+        if (x == cx + 1 && y == cy) {
+            goForward();
+            cx++;
+        }
+
+        //Go left
+        if (x == cx && y == cy - 1) {
+            Turn(90);
+            goForward();
+            Turn(-90);
+            cy--;
+        }
+
+        //Go right
+        if (x == cx && y == cy + 1) {
+            Turn(-90);
+            goForward();
+            Turn(+90);
+            cy++;
+        }
+    }
+
     public void runNextBox() {
         //Go front
         int tx = cx + 1;
         int ty = cy;
         if (check(tx,ty)) {
             if (isClear()) {
+                lastPos[tx][ty] = new Vector2d(cx,cy);
                 cx = tx;
                 cy = ty;
                 isVisited[cx][cy] = true;
 
                 goForward();
+
+                updateData();
             }
         }
 
@@ -90,11 +138,14 @@ public class AutoCollectData extends LinearOpMode {
         if (check(tx,ty)) {
             Turn(180);
             if (isClear()) {
+                lastPos[tx][ty] = new Vector2d(cx,cy);
                 cx = tx;
                 cy = ty;
                 isVisited[cx][cy] = true;
 
                 goForward();
+
+                updateData();
             }
             Turn(180);
         }
@@ -105,11 +156,14 @@ public class AutoCollectData extends LinearOpMode {
         if (check(tx,ty)) {
             Turn(90);
             if (isClear()) {
+                lastPos[tx][ty] = new Vector2d(cx,cy);
                 cx = tx;
                 cy = ty;
                 isVisited[cx][cy] = true;
 
                 goForward();
+
+                updateData();
             }
             Turn(-90);
         }
@@ -120,19 +174,27 @@ public class AutoCollectData extends LinearOpMode {
         if (check(tx,ty)) {
             Turn(-90);
             if (isClear()) {
+                lastPos[tx][ty] = new Vector2d(cx,cy);
                 cx = tx;
                 cy = ty;
                 isVisited[cx][cy] = true;
 
                 goForward();
+
+                updateData();
             }
             Turn(90);
         }
+
+        runBack();
     }
 
     public void updateData() {
-        Pose2d currentPose = tankDrive.getPoseEstimate();
-        DistanceData currentData = new DistanceData(currentPose, distSensor.getDist(), currentAngle);
-        dataStorage.add(currentData);
+        for (int i = 0; i < 8 ; i++) {
+            Pose2d currentPose = tankDrive.getPoseEstimate();
+            DistanceData currentData = new DistanceData(currentPose, distSensor.getDist(), currentAngle);
+            dataStorage.add(currentData);
+            Turn(45);
+        }
     }
 }

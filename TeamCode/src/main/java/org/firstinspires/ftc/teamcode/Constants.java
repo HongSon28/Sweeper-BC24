@@ -5,7 +5,6 @@ import com.acmerobotics.roadrunner.geometry.Pose2d;
 
 @Config
 public class Constants {
-    @Config
     public static class DISTANCE_SENSOR {
         public static final Pose2d DS_LOCATION = new Pose2d(0, 1, 0);
 
@@ -17,5 +16,9 @@ public class Constants {
     }
     public static class GRID {
         public static final double GRID_SIZE = 20;
+    }
+
+    public static class MAP {
+        public static double BOT_CENTER_TO_DISTANCE_SENSOR = 7.08;
     }
 }

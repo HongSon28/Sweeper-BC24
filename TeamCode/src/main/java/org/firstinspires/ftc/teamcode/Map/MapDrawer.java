@@ -3,8 +3,12 @@ package org.firstinspires.ftc.teamcode.Map;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.canvas.Canvas;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+
+import static org.firstinspires.ftc.teamcode.Constants.MAP.*;
 
 public class MapDrawer {
+    private LinearOpMode opMode;
     private FtcDashboard dashboard;
     public TelemetryPacket packet;
     public Canvas canvas;
@@ -42,10 +46,12 @@ public class MapDrawer {
         scale_factor = _scale_factor;
     }
 
-    public void init() {
-        // Clear and rotate field to make it Descartes-compatible
+    public void init(LinearOpMode _opMode) {
+        // Set opMode object
+        opMode = _opMode;
+
+        // Clear field
         canvas.clear();
-        canvas.setRotation(-Math.PI / 2);
 
         // Draw field outer frame
         canvas.setFill("white").fillRect(-72, -72, 144, 144);
@@ -61,6 +67,19 @@ public class MapDrawer {
         dashboard.sendTelemetryPacket(packet);
     }
 
+    public double angleWrap(double radians) {
+
+        while (radians > Math.PI) {
+            radians -= 2 * Math.PI;
+        }
+        while (radians < -Math.PI) {
+            radians += 2 * Math.PI;
+        }
+
+        // keep in mind that the result is in radians
+        return radians;
+    }
+
     private static void rotatePoints(double[] xPoints, double[] yPoints, double angle) {
         for (int i = 0; i < xPoints.length; i++) {
             double x = xPoints[i];
@@ -71,21 +90,26 @@ public class MapDrawer {
     }
 
     public void drawBot(double x, double y, double rad) {
-        double[] xPoints = {x * scale_factor, (x + bot_w) * scale_factor};
+        /*double[] xPoints = {x * scale_factor, (x + bot_w) * scale_factor};
         double[] yPoints = {y * scale_factor, (y + bot_h) * scale_factor};
         rotatePoints(xPoints, yPoints, rad);
-        canvas.setFill("green").fillPolygon(xPoints, yPoints);
+        canvas.setFill("green").fillPolygon(xPoints, yPoints);*/
+        canvas.setFill("green").strokeLine(x, y, x + Math.cos(rad) * 5, y + Math.sin(rad) * 5);
     }
 
-    public void drawPoint(double distance, double rad) {
-        double x = distance * Math.sin(rad) * scale_factor;
-        double y = distance * Math.cos(rad) * scale_factor;
-        canvas.setFill("red").fillCircle(x, y, 1);
+    public void drawPoint(double x, double y, double distance, double rad) {
+        double d = distance + BOT_CENTER_TO_DISTANCE_SENSOR;
+        double p_x = d * Math.cos(rad) * scale_factor;
+        double p_y = d * Math.sin(rad) * scale_factor;
+        canvas.setFill("red").fillCircle(x + p_x, y + p_y, 1);
+        //opMode.telemetry.addData("point", "%f, %f", x + p_x, y + p_y);
+        //opMode.telemetry.update();
     }
 
     public void drawState(double x, double y, double rad, double dist) {
+        //double ang = angleWrap(rad + Math.PI/2);
         //drawBot(x, y, rad);
-        drawPoint(dist, rad);
+        drawPoint(x, y, dist, rad);
         update();
     }
 }

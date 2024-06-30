@@ -67,6 +67,7 @@ public class AutoCollectData extends LinearOpMode {
     }
 
     boolean isClear() {
+        sleep(600);
         double temp = distSensor.getRawDist();
         telemetry.addData("Clear Check: ",temp);
         telemetry.update();
@@ -230,6 +231,7 @@ public class AutoCollectData extends LinearOpMode {
     public void updateData() {
         Pose2d currentPose;
         for (int i = 0; i < 8 ; i++) {
+            sleep(500);
             currentPose = tankDrive.getPoseEstimate();
             DistanceData currentData = new DistanceData(currentPose, distSensor.getDist(), currentAngle);
             dataStorage.add(currentData);

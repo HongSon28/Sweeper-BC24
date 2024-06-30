@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.OpModes;
 
 import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
@@ -19,16 +20,17 @@ import static org.firstinspires.ftc.teamcode.Constants.DISTANCE_SENSOR.*;
 import java.util.Vector;
 import java.util.concurrent.TimeUnit;
 
+@Config
 @TeleOp(name = "Auto Collect Drive")
 public class AutoCollectData extends LinearOpMode {
 
     boolean[][] isVisited = new boolean[50][50];
     Vector2d[][] lastPos = new Vector2d[50][50];
-    int cx = 0, cy = 0;
+    int cx = 20, cy = 20;
     private SampleTankDrive tankDrive;
     private DistSensor distSensor;
     private ServoAngle servo;
-    private double currentAngle = 0;
+    public static double currentAngle = 226;
     public Vector <DistanceData> dataStorage;
     private MapDrawer mapDrawer;
     private FtcDashboard dashboard;
@@ -46,14 +48,13 @@ public class AutoCollectData extends LinearOpMode {
         waitForStart();
 
         while (opModeIsActive()) {
+            servo.setAngle(currentAngle);
             if (!isVisited[cx][cy]) {
                 updateData();
                 isVisited[cx][cy] = true;
             }
             runNextBox();
             tankDrive.updatePoseEstimate();
-
-            servo.setAngle(currentAngle);
 
             Pose2d currentPose = tankDrive.getPoseEstimate();
             telemetry.addData("Current X: ", currentPose.getX());
@@ -66,9 +67,10 @@ public class AutoCollectData extends LinearOpMode {
     }
 
     boolean isClear() {
-        telemetry.addData("Clear Check: ",distSensor.getRawDist());
+        double temp = distSensor.getRawDist();
+        telemetry.addData("Clear Check: ",temp);
         telemetry.update();
-        return distSensor.getRawDist() >= CLEAR_THRESHOLD;
+        return temp >= CLEAR_THRESHOLD;
     }
     boolean check(int x, int y) {
         return (x>=0 && y>=0 && x<50 && y<50 && !isVisited[x][y]);
@@ -87,6 +89,12 @@ public class AutoCollectData extends LinearOpMode {
         tankDrive.updatePoseEstimate();
     }
 
+    public void goTo(int x, int y) {
+        Trajectory trajectory = tankDrive.trajectoryBuilder(tankDrive.getPoseEstimate()).splineTo(new Vector2d((cx - 20) * GRID_SIZE, (cy - 20) * GRID_SIZE),Math.toRadians(0)).build();
+        tankDrive.followTrajectory(trajectory);
+        //tankDrive.waitForIdle();
+        //tankDrive.updatePoseEstimate();
+    }
 
     public void Turn(double angle) {
         tankDrive.turn(Math.toRadians(angle));
@@ -99,30 +107,34 @@ public class AutoCollectData extends LinearOpMode {
         int y = (int) lastPos[cx][cy].getY();
         //Go back
         if (x == cx - 1 && y == cy) {
-            goBackward();
+            //goBackward();
             cx--;
+            goTo(cx,cy);
         }
 
         //Go front
         if (x == cx + 1 && y == cy) {
-            goForward();
+            //goForward();
             cx++;
+            goTo(cx,cy);
         }
 
         //Go left
         if (x == cx && y == cy - 1) {
-            Turn(90);
-            goForward();
-            Turn(-90);
+            //Turn(90);
+            //goForward();
+            //Turn(-90);
             cy--;
+            goTo(cx,cy);
         }
 
         //Go right
         if (x == cx && y == cy + 1) {
-            Turn(-90);
-            goForward();
-            Turn(+90);
+            //Turn(-90);
+            //goForward();
+            //Turn(+90);
             cy++;
+            goTo(cx,cy);
         }
     }
 
@@ -137,7 +149,8 @@ public class AutoCollectData extends LinearOpMode {
                 cy = ty;
                 isVisited[cx][cy] = true;
 
-                goForward();
+                //goForward();
+                goTo(cx,cy);
 
                 updateData();
                 return;
@@ -155,11 +168,12 @@ public class AutoCollectData extends LinearOpMode {
                 cy = ty;
                 isVisited[cx][cy] = true;
 
-                goForward();
+                //goForward();
+                goTo(cx,cy);
 
                 updateData();
 
-                Turn(180);
+                //Turn(180);
                 return;
             }
             Turn(180);
@@ -169,55 +183,61 @@ public class AutoCollectData extends LinearOpMode {
         tx = cx;
         ty = cy - 1;
         if (check(tx,ty)) {
-            Turn(90);
+            Turn(-90);
             if (isClear()) {
                 lastPos[tx][ty] = new Vector2d(cx,cy);
                 cx = tx;
                 cy = ty;
                 isVisited[cx][cy] = true;
 
-                goForward();
+                //goForward();
+                goTo(cx,cy);
 
                 updateData();
 
-                Turn(-90);
+                //Turn(-90);
                 return;
             }
-            Turn(-90);
+            Turn(90);
         }
 
         //Go Right
         tx = cx;
         ty = cy + 1;
         if (check(tx,ty)) {
-            Turn(-90);
+            Turn(90);
             if (isClear()) {
                 lastPos[tx][ty] = new Vector2d(cx, cy);
                 cx = tx;
                 cy = ty;
                 isVisited[cx][cy] = true;
 
-                goForward();
+                //goForward();
+                goTo(cx,cy);
 
                 updateData();
 
-                Turn(90);
+                //Turn(90);
                 return;
             }
-            Turn(90);
+            Turn(-90);
         }
-        if (cx == 0 && cy == 0) return;
+        if (cx == 20 && cy == 20) return;
 
         runBack();
     }
 
     public void updateData() {
+        Pose2d currentPose;
         for (int i = 0; i < 8 ; i++) {
-            Pose2d currentPose = tankDrive.getPoseEstimate();
+            currentPose = tankDrive.getPoseEstimate();
             DistanceData currentData = new DistanceData(currentPose, distSensor.getDist(), currentAngle);
             dataStorage.add(currentData);
             mapDrawer.drawState(currentPose.getX(), currentPose.getY(), mapDrawer.angleWrap(currentPose.getHeading()), distSensor.getDist());
             Turn(45);
         }
+
+        currentPose = tankDrive.getPoseEstimate();
+        Turn(Math.toDegrees(-currentPose.getHeading()));
     }
 }

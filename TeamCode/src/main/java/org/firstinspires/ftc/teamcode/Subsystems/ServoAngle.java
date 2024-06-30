@@ -11,7 +11,7 @@ public class ServoAngle {
     public ServoAngle(HardwareMap hardwareMap) {
         servo = (ServoImplEx) hardwareMap.get(Servo.class, "servo");
         servo.setPwmRange(new PwmControl.PwmRange(500, 2500));
-        servo.setPosition(offset);
+        servo.setPosition(1);
     }
 
     public void setAngle(double angle) {

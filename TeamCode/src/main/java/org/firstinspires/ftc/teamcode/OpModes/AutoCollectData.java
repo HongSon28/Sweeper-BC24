@@ -163,6 +163,8 @@ public class AutoCollectData extends LinearOpMode {
         if (check(tx,ty)) {
             Turn(180);
             if (isClear()) {
+                Turn(90);
+                Turn(90);
                 lastPos[tx][ty] = new Vector2d(cx,cy);
                 cx = tx;
                 cy = ty;

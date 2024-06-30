@@ -110,6 +110,8 @@ public class MapDrawer {
     }
 
     public void drawState(double x, double y, double rad, double dist) {
+        if (dist <= 0) return;
+
         logger.logI(x, y, rad, dist);
         //double ang = angleWrap(rad + Math.PI/2);
         //drawBot(x, y, rad);

@@ -12,7 +12,8 @@ public class Constants {
         public static double KALMAN_R = 3;
         public static int KALMAN_N = 3;
         public static int DISTANCE_THRESHOLD = 75;
-        public static final double CLEAR_THRESHOLD = 13.5;
+        public static final double CLEAR_THRESHOLD = 20;
+        public static final double DELTA_DISTANCE_THRESHOLD = 0.5;
     }
     public static class GRID {
         public static final double GRID_SIZE = 10;
